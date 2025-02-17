@@ -25,7 +25,7 @@ export class S3Service {
 
     const result = await this.s3.upload(params).promise();
     return result.Location; // Return the file URL
-  } 
+  }
 
   async deleteFile(fileKey: string): Promise<void> {
     const params = {
