@@ -30,7 +30,7 @@ export class Company {
   @Column({ type: 'varchar', length: 255, nullable: true })
   logo: string;
 
-  @ManyToOne(() => User, (user) => user.companies)
+  @ManyToOne(() => User, (user) => user.companies, {nullable: false})
   @JoinColumn({ name: 'owner_id' })
   owner: User;
 

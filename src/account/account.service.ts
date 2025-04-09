@@ -3,7 +3,6 @@ import { DataSource, EntityManager } from 'typeorm';
 import { CompanyService } from '../company/services/company/company.service';
 import { AuthService } from '../auth/services/auth/auth.service';
 import { StockService } from '../stock/services/stock/stock.service';
-import { UserService } from '../core/services/user/user.service';
 import { CreateAccountDto } from '../core/dtos/acccount.dto';
 import { UserAccessInfo } from '../core/dtos/user.dto';
 import { Company } from '../core/entities/company.entity';
@@ -11,6 +10,9 @@ import { Stock } from '../core/entities/stock.entity';
 import { Category } from '../core/entities/category.entity';
 import { CategoryService } from '../core/services/category/category.service';
 import { CompanyResponseDto } from '../company/dtos/company.dto';
+import { generateReference } from '../core/uttils/generate-reference';
+import { HttpStatusCode } from 'axios';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AccountService {
@@ -29,33 +31,30 @@ export class AccountService {
     /**
      * Create a new account transactionally
      */
-    async create(userAccount: CreateAccountDto): Promise<CreateAccountDto> {
+    async create(userAccount: CreateAccountDto): Promise<any> {
         const { user, company } = userAccount;
 
         // Start a transaction
-       
+        return await this.dataSource.transaction(async manager => {
             try {
-                const userAccessInfo = await this.createUser(user);
-                const createdUser = await this.userService.findById(userAccessInfo.user.id);
-                this.validateUserCreation(createdUser);
+                const userAccessInfo = await this.createUser(user, manager);
+                const createdCompany = await this.createCompany(userAccessInfo.user, company, manager);
+                await this.createDefaultStock(createdCompany, manager);
+                await this.createDefaultCategory(createdCompany, manager);
 
-                const createdCompany = await this.createCompany(createdUser, company);
-                const foundCompany = await this.companyService.getUserCompanyById(createdCompany.id);
-                this.validateCompanyCreation(foundCompany!);
-
-                await this.createDefaultStock(foundCompany!);
-                await this.createDefaultCategory(foundCompany!);
-
-                return this.buildCreatedAccountDto(createdUser, createdCompany);
+                return {
+                    statusCode: HttpStatusCode.Created,
+                    message: 'Account created succesfully'
+                }
             } catch (error) {
-                this.logger.error('Error creating account', error);
-                throw error;
+                
+                throw new Error(error || 'Failed to create acccount');
             }
-    
+        });
     }
 
-    private async createUser(user: CreateAccountDto['user']): Promise<UserAccessInfo> {
-        return this.authService.createUser('', '', user.email, '', user.password);
+    private async createUser(user: CreateAccountDto['user'], manager: EntityManager): Promise<UserAccessInfo> {
+        return this.authService.createUser(user.email, user.phone, user.password);
     }
 
     private validateUserCreation(user: any): void {
@@ -64,8 +63,8 @@ export class AccountService {
         }
     }
 
-    private async createCompany(user: any, company: CreateAccountDto['company']): Promise<CompanyResponseDto> {
-        return this.companyService.createCompany(user, company);
+    private async createCompany(user: any, company: CreateAccountDto['company'], manager: EntityManager): Promise<Company> {
+        return this.companyService.createCompany(user, company, manager);
     }
 
     private validateCompanyCreation(company: Company): void {
@@ -74,29 +73,24 @@ export class AccountService {
         }
     }
 
-    private async createDefaultStock(company: Company): Promise<void> {
+    private async createDefaultStock(company: Company, manager: EntityManager): Promise<void> {
         const defaultStock = new Stock();
-        defaultStock.label = this.DEFAULT;
+        defaultStock.name = this.DEFAULT;
         defaultStock.description = 'Stock par défaut';
-        defaultStock.idNumber = 0;
+        defaultStock.reference = generateReference('STK');
         defaultStock.company = company;
 
-        await this.stockService.createStock(defaultStock);
+        await manager.save(defaultStock);
     }
 
-    private async createDefaultCategory(company: Company): Promise<void> {
+    private async createDefaultCategory(company: Company, manager: EntityManager): Promise<void> {
         const defaultCategory = new Category();
         defaultCategory.company = company;
         defaultCategory.label = this.DEFAULT;
         defaultCategory.description = "Catégorie par defaut";
 
-        await this.categoryService.create(defaultCategory);
+        await manager.save(defaultCategory);
     }
 
-    private buildCreatedAccountDto(user: any, company: CompanyResponseDto): CreateAccountDto {
-        const createdAccount = new CreateAccountDto();
-        createdAccount.company = company;
-        createdAccount.user = user;
-        return createdAccount;
-    }
+   
 }

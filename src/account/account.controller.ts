@@ -12,10 +12,9 @@ export class AccountController {
      * @returns The created account details
      */
     @Post()
-    async create(@Body() createAccountDto: CreateAccountDto): Promise<CreateAccountDto> {
+    async create(@Body() createAccountDto: CreateAccountDto): Promise<any> {
         try {
-            const createdAccount = await this.accountService.create(createAccountDto);
-            return createdAccount;
+            return  await this.accountService.create(createAccountDto);
         } catch (error) {
             // Handle specific errors or rethrow as HttpException
             throw new HttpException(

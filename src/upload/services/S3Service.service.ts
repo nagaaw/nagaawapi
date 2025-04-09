@@ -27,6 +27,21 @@ export class S3Service {
     return result.Location; // Return the file URL
   }
 
+  async uploadFilePDF(filePath: string, buffer: Buffer): Promise<string> {
+    const params = {
+      Bucket: this.configService.get('AWS_BUCKET_NAME'),
+      Key: filePath,
+      Body: buffer,
+      ContentType: 'application/pdf',
+      ACL: 'public-read', // Make the file publicly accessible
+
+    };
+
+    const result = await this.s3.upload(params).promise();
+    return result.Location; // Return the file URL
+  }
+
+
   async deleteFile(fileKey: string): Promise<void> {
     const params = {
       Bucket: this.configService.get('AWS_BUCKET_NAME'),

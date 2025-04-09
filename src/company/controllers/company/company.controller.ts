@@ -4,22 +4,22 @@ import { AuthGuard } from '@nestjs/passport';
 import { Company } from '../../../core/entities/company.entity';
 import { CurrentUser } from '../../../core/uttils/current-user.decoration';
 import { User } from '../../../core/entities/user.entity';
-import { CreateCompanyDto } from '../../dtos/company.dto';
+import { CreateCompanyDto, UpdateCompanyDto } from '../../dtos/company.dto';
 
 @Controller('company')
 @UseGuards(AuthGuard('jwt')) // Protéger avec JWT
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
-  @Post()
-  async createCompany(@CurrentUser() user: User, @Body() company: CreateCompanyDto) {
+  // @Post()
+  // async createCompany(@CurrentUser() user: User, @Body() company: CreateCompanyDto) {
     
-    return this.companyService.createCompany(user,company);
-  }
+  //   return this.companyService.createCompany(user,company);
+  // }
 
   @Get()
   @UseGuards(AuthGuard('jwt')) // Protéger avec JWT
-  async getCompanies(@Req() req) {
+  async getCompanies(@Req() req) { 
     return this.companyService.getUserCompany(req.user.id);
   }
   @Get(':id')
@@ -30,7 +30,7 @@ export class CompanyController {
 
   @Patch()
   @UseGuards(AuthGuard('jwt')) // Protéger avec JWT
-  async updateCompany(@Req() req, @Body() company: CreateCompanyDto) {
+  async updateCompany(@Req() req, @Body() company: UpdateCompanyDto) {
 
     return this.companyService.updateCompany(req.user.id,company);
   }

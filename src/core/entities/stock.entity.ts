@@ -16,11 +16,11 @@ export class Stock {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'int', nullable: false, unique: true })
-  idNumber: number;
+  @Column({ type: 'varchar', nullable: false, unique: true })
+  reference: string;
 
   @Column({ type: 'varchar', nullable: false })
-  label: string;
+  name: string;
 
   @Column({ type: 'varchar', nullable: true })
   description?: string;
@@ -28,7 +28,7 @@ export class Stock {
   @Column({ type: 'varchar', nullable: true })
   localisation?: string;
 
-  @OneToMany(() => StockProduct, (stockProduct) => stockProduct.stock)
+  @OneToMany(() => StockProduct, (stockProduct) => stockProduct.stock, {lazy: true})
   stockProducts?: StockProduct[]; // Relationship with StockProduct
 
   @ManyToOne(() => Company, (company) => company.stocks) // Many-to-One relationship with Company

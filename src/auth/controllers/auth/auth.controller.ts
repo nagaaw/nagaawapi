@@ -8,13 +8,11 @@ export class AuthController {
 
   @Post('register')
   async register(
-    @Body('firstName') firstName: string,
-    @Body('lastName') lastName: string,
     @Body('email') email: string,
     @Body('phone') phone: string,
     @Body('password') password: string,
   ) {
-    return this.authService.createUser(firstName, lastName, email, phone, password);
+    return this.authService.createUser( email, phone, password);
   }
 
   @Post('login')
@@ -24,7 +22,7 @@ export class AuthController {
 
   @Post('request-reset-password')
   async requestResetPassword(@Body('email') email: string) {
-    return this.authService.requestPasswordReset(email);
+    return this.authService.requestResetPassword(email);
   }
 
   @Post('reset-password')
@@ -35,10 +33,10 @@ export class AuthController {
     return this.authService.resetPassword(resetToken, newPassword);
   }
   // Redirection vers LinkedIn
-  @Get('linkedin')
-  @UseGuards(AuthGuard('linkedin'))
+  @Get('linkedin') 
+  @UseGuards(AuthGuard('linkedin')) 
   async linkedinLogin() {
-    return { message: 'Redirecting to LinkedIn...' };
+    return { message: 'Redirecting to LinkedIn...' }; 
   }
 
   // Callback après l'auth LinkedIn
@@ -59,5 +57,20 @@ export class AuthController {
   @Post('logout')
   async logout(@Body('userId') userId: number) {
     return this.authService.logout(userId);
+  }
+
+  @Post('validate-otp')
+  async validateOtp(
+    @Body('email') email: string,
+    @Body('otp') otp: string,
+  ) {
+    await this.authService.validateOtp(email, otp);
+    return { message: 'OTP validated successfully' };
+  }
+
+  @Post('resend-otp')
+  async resendOtp(@Body('email') email: string) {
+    await this.authService.resendOtp(email);
+    return { message: 'OTP resent successfully' };
   }
 }

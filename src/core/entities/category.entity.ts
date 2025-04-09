@@ -6,6 +6,7 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -29,7 +30,7 @@ export class Category {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToMany(() => Product, (product) => product.categories) // Define the inverse side
+  @OneToMany(() => Product, (product) => product.category) // Define the inverse side
   @JoinTable()
   products?: Product[];
 

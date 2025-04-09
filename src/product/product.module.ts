@@ -11,11 +11,13 @@ import { Category } from '../core/entities/category.entity';
 import { CategoryController } from './controllers/category/category.controller';
 import { CategoryService } from '../core/services/category/category.service';
 import { StockProduct } from '../core/entities/stock_product.entity';
+import { Supplier } from '../core/entities/supplier.entity';
+import { SalesPackaging } from '../core/entities/sales_packaging.entity';
 
 
 @Module({
   imports:[
-        TypeOrmModule.forFeature([User, Company,Product, Stock, Category, StockProduct]),
+        TypeOrmModule.forFeature([User, Company,Product, Stock, Category, StockProduct, Supplier, SalesPackaging]),
     
   ],
   controllers: [ProductsController, CategoryController, CategoryController],

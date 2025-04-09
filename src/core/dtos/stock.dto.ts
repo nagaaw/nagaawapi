@@ -4,11 +4,11 @@ import { IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
 export class CreateStockDto{
       @IsNotEmpty()
       @IsInt()
-      idNumber: number;
+      reference: number;
     
       @IsNotEmpty()
       @IsString()
-      label: string;
+      name: string;
     
       @IsOptional()
       @IsString()

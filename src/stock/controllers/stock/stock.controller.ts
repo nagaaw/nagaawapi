@@ -11,10 +11,15 @@ import {
 import { StockService } from '../../services/stock/stock.service';
 import { CreateStockDto } from '../../../core/dtos/stock.dto';
 import { CreateStockProductDto } from '../../dtos/stock.dto';
+import { Stock } from '../../../core/entities/stock.entity';
+import { Repository } from 'typeorm';
+import { Product } from '../../../core/entities/product.entity';
 
 @Controller('stock')
 export class StockController {
-  constructor(private readonly stockService: StockService) {}
+  constructor(
+    private readonly stockService: StockService
+  ) {}
 
   /**
    * Increment stock for a product.
@@ -87,11 +92,20 @@ export class StockController {
    * @returns The created stock.
    */
   @Post()
-  async createStock(@Body() stockDto: CreateStockDto) {
+  async createStock(@Body() stock: Stock) {
     try {
-      return await this.stockService.createStock(stockDto);
+      return await this.stockService.createStock(stock);
     } catch (error) {
       throw new ConflictException('Failed to create stock.');
+    }
+  }
+
+  @Get(':stockId/products')
+  async findStockProducts(@Param('stockId') stockId: number){
+    try{
+      return await this.stockService.getAllStockProducts(stockId)
+    } catch(error) {
+      throw new Error('Failed to retreive products')
     }
   }
 }

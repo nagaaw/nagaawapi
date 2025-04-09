@@ -26,7 +26,7 @@ import { CreateCategoryDto, UpdateCategoryDto } from '../../dtos/category.dto';
   
     @Get(':id')
     async findOne(@Param('id') id: number) {
-      return this.categoryService.findOne(id);
+      return this.categoryService.findOneById(id);
     }
   
     @Put(':id')

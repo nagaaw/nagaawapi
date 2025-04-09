@@ -6,6 +6,7 @@ import { Product } from '../../../core/entities/product.entity';
 import { CreateStockDto } from '../../../core/dtos/stock.dto';
 import { StockProduct } from '../../../core/entities/stock_product.entity';
 import { CreateStockProductDto } from '../../dtos/stock.dto';
+import { generateReference } from '../../../core/uttils/generate-reference';
 
 @Injectable()
 export class StockService {
@@ -97,21 +98,30 @@ export class StockService {
    * @returns A list of all stocks.
    */
   async getAllStocks(): Promise<Stock[]> {
-    return this.stockRepository.find({ relations: ['stockProducts', 'stockProducts.product'] });
+    return this.stockRepository.find();
+  }
+
+  /**
+   * Get all stocks with their associated products.
+   * @returns A list of all stocks.
+   */
+  async getAllStockProducts(stockId: number): Promise<StockProduct[]> {
+    return  await this.stockProductRepository.find({where: {stock:{id: stockId}}, relations:['stock']});
   }
 
   /**
    * Create a new stock.
-   * @param stockDto The data to create the stock.
+   * @param stock The data to create the stock.
    * @param manager Optional EntityManager for transactions.
    * @returns The created stock.
    */
-  async createStock(stockDto: CreateStockDto, manager?: EntityManager): Promise<Stock> {
+  async createStock(stockD: Stock, manager?: EntityManager): Promise<Stock> {
     try {
-      const stock = this.stockRepository.create(stockDto);
+      const stock = this.stockRepository.create(stockD);
       if (manager) {
         return await manager.save(Stock, stock);
       }
+      stock.reference = generateReference('STK');
       return await this.stockRepository.save(stock);
     } catch (error) {
       this.logger.error(`Failed to create stock: ${error.message}`);

@@ -11,7 +11,6 @@ import {
 import { ProductsService } from '../../services/product/product.service';
 import { Product } from '../../../core/entities/product.entity';
 import { CreateProductDTO, UpdateProductDTO } from '../../dtos/product.dto';
-import { UpdateCategoryDto } from '../../dtos/category.dto';
  
   
   @Controller('products')
@@ -22,8 +21,16 @@ import { UpdateCategoryDto } from '../../dtos/category.dto';
     async findAll(
       @Query('page') page: number = 1,
       @Query('limit') limit: number = 10,
+      @Query('active') active?: boolean,
+      @Query('searchKeyWord') searchKeyWord?: string,
+      @Query('storageUnit') storageUnit?: string,
+      @Query('reference') reference?: 'DESC' | 'ASC' | undefined,
+      @Query('codeBarre') codeBarre?: 'DESC' | 'ASC' | undefined,
+      @Query('name') name?: 'DESC' | 'ASC' | undefined
     ): Promise<{ data: Product[]; total: number }> {
-      return this.productsService.findAll(page, limit);
+    
+      const storageUnits = storageUnit?.split('') 
+      return this.productsService.findAll(page, limit,active, reference, codeBarre, name, storageUnits, searchKeyWord);
     }
   
     @Get(':id')
@@ -32,7 +39,7 @@ import { UpdateCategoryDto } from '../../dtos/category.dto';
     }
   
     @Post()
-    create(@Body() product: Product): Promise<Product> {
+    create(@Body() product: CreateProductDTO): Promise<Product> {
       return this.productsService.create(product);
     }
   

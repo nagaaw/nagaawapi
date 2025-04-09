@@ -9,6 +9,8 @@ import { LinkedInStrategy } from './utils/linkedin.strategy';
 import { Company } from '../core/entities/company.entity';
 import { SocialmediaController } from './controllers/socialmedia/socialmedia.controller';
 import { LinkedinService } from './services/linkedin/linkedin.service';
+import { MailerService } from '../core/services/mailer/mailer.service';
+import { OrangeSmsService } from '../core/services/sms/orange-sms.service';
 
 
 @Module({
@@ -25,7 +27,7 @@ import { LinkedinService } from './services/linkedin/linkedin.service';
     }),
   ],
   controllers: [AuthController, SocialmediaController],
-  providers: [AuthService, LinkedInStrategy, LinkedinService],
+  providers: [AuthService, LinkedInStrategy, LinkedinService,MailerService,OrangeSmsService],
   exports: [AuthService],
 })
 export class AuthModule {}

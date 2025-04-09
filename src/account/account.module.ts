@@ -12,13 +12,15 @@ import { Product } from '../core/entities/product.entity';
 import { BusinessModel } from '../core/entities/businessmodel.entity';
 import { StockService } from '../stock/services/stock/stock.service';
 import { CompanyService } from '../company/services/company/company.service';
-import { UserService } from '../core/services/user/user.service';
 import { CategoryService } from '../core/services/category/category.service';
 import { AuthService } from '../auth/services/auth/auth.service';
 import { OpenAIService } from '../core/services/openai/openai.service';
 import { LinkedInStrategy } from '../auth/utils/linkedin.strategy';
 import { LinkedinService } from '../auth/services/linkedin/linkedin.service';
 import { StockProduct } from '../core/entities/stock_product.entity';
+import { MailerService } from '../core/services/mailer/mailer.service';
+import { UserService } from '../user/user.service';
+import { OrangeSmsService } from '../core/services/sms/orange-sms.service';
 
 @Module({
   imports: [
@@ -43,7 +45,9 @@ import { StockProduct } from '../core/entities/stock_product.entity';
     AuthService,
     OpenAIService,
     LinkedInStrategy,
-    LinkedinService
+    LinkedinService,
+    MailerService,
+    OrangeSmsService
   ],
 })
 export class AccountModule {}

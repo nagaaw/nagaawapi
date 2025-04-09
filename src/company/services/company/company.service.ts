@@ -3,11 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { Company } from '../../../core/entities/company.entity';
 import { User } from '../../../core/entities/user.entity';
-import { CompanyResponseDto, CreateCompanyDto } from '../../dtos/company.dto';
+import { CompanyResponseDto, CreateCompanyDto, UpdateCompanyDto } from '../../dtos/company.dto';
 import { CompanyMapper } from '../../dtos/company.mapper';
 import { OpenAIService } from '../../../core/services/openai/openai.service';
 import { generateBusinessModelPrompt } from '../../../core/services/openai/openai_prompt_generator';
 import { BusinessModel } from '../../../core/entities/businessmodel.entity';
+import { Stock } from '../../../core/entities/stock.entity';
 
 @Injectable()
 export class CompanyService {
@@ -26,8 +27,8 @@ export class CompanyService {
   /**
    * Create a new company with the current user as owner.
    */
-  async createCompany(user: User , company: CreateCompanyDto, manager?: EntityManager):
-   Promise<CompanyResponseDto> {
+  async createCompany(user: User , company: CreateCompanyDto, manager: EntityManager):
+   Promise<Company> {
    // const user = await this.userRepository.findOne({ where: { id: user.id }, relations: ['company'] });
 
     if (!user) {
@@ -38,17 +39,15 @@ export class CompanyService {
       throw new ForbiddenException('User already owns a company');
     }
 
-    const newCompany = this.companyRepository.create({
+    const newCompany = manager.create(Company,{
       name: company.name,
-      description: company.description,
       sector: company.sector,
       owner: user,
     });
 
-    if(manager){
-      return await manager.save(Company,newCompany )
-    }
-    const createdCompany: Company = await this.companyRepository.save(newCompany);
+ 
+    const createdCompany: Company = await manager.save(Company,newCompany);
+
     const {id,name, description, sector} = createdCompany;
     // const prompt: string = generateBusinessModelPrompt(name,description,sector);
    
@@ -76,7 +75,7 @@ export class CompanyService {
     }
  
   
-    return  CompanyMapper.toDto(createdCompany)
+    return  createdCompany
   }
 
   /**
@@ -107,7 +106,7 @@ export class CompanyService {
   /**
    * Update company details.
    */
-  async updateCompany(userId: number, company: CreateCompanyDto): Promise<Company> {
+  async updateCompany(userId: number, company: UpdateCompanyDto): Promise<Company> {
     const user = await this.companyRepository.findOne({ where: { id: company.id, owner: {id: userId} } });
 
     if (!company) {
@@ -132,4 +131,6 @@ export class CompanyService {
    
     return { message: 'Company deleted successfully' };
   }
+
+ 
 }

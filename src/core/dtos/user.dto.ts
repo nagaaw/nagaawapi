@@ -9,6 +9,11 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   password: string;
+
+  @IsNotEmpty()
+  @IsString()
+  phone: string;
+  
 }
 
 export class UserResponse{
@@ -30,7 +35,7 @@ export class UserResponse{
 
    @IsOptional()
    @IsString()
-   phone?: string;
+   phone: string;
 
    @IsOptional()
    @IsUrl()

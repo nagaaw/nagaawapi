@@ -5,7 +5,6 @@ import { User } from './core/entities/user.entity';
 import { ProjectModule } from './project/project.module';
 import { Company } from './core/entities/company.entity';
 import { CompanyModule } from './company/company.module';
-import { UserService } from './core/services/user/user.service';
 import { ConfigModule } from '@nestjs/config';
 import { ProductModule } from './product/product.module';
 import { Product } from './core/entities/product.entity';
@@ -24,6 +23,18 @@ import { OrderItem } from './core/entities/orderitem.entity';
 import { PaymentModule } from './payment/payment.module';
 import { Payment } from './core/entities/payment.entity';
 import { UploadModule } from './upload/upload.module';
+import { ClientModule } from './client/client.module';
+import { SupplierController } from './supplier/supplier.controller';
+import { SupplierModule } from './supplier/supplier.module';
+import { Client } from './core/entities/client.enity';
+import { Supplier } from './core/entities/supplier.entity';
+import { SalesPackaging } from './core/entities/sales_packaging.entity';
+import { PdfMakerService } from './core/services/pdf_maker.service';
+import { S3Service } from './upload/services/S3Service.service';
+import { ReceiptOrder } from './core/entities/receipt_order.entity';
+import { ReceiptOrderItem } from './core/entities/receipt_order_item.entity';
+import { UserModule } from './user/user.module';
+import { OrangeSmsService } from './core/services/sms/orange-sms.service';
 
 @Module({
   imports: [
@@ -39,6 +50,8 @@ import { UploadModule } from './upload/upload.module';
       Stock,
       Category,
       StockProduct,
+      Supplier,
+      Client
     ]),
     TypeOrmModule.forRoot({
       type: 'mysql',
@@ -58,6 +71,12 @@ import { UploadModule } from './upload/upload.module';
         Order,
         OrderItem,
         Payment,
+        Supplier,
+        Client,
+        SalesPackaging,
+        ReceiptOrder,
+        ReceiptOrderItem
+        
       ],
       synchronize: true,
     }),
@@ -69,13 +88,14 @@ import { UploadModule } from './upload/upload.module';
     OrderModule,
     PaymentModule,
     UploadModule,
+    ClientModule,
+    SupplierModule,
+    UserModule,
   ],
-  controllers: [],
   providers: [
-    UserService, 
-    OpenAIService, 
-    CategoryService, 
-    StockService
+    OpenAIService,
+    PdfMakerService,
+    S3Service
   ],
 })
 export class AppModule {}
